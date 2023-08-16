@@ -70,9 +70,10 @@ public class ResponseServlet extends HttpServlet {
 			String name = request.getParameter("name");
 			String address = request.getParameter("address");
 			Integer age = Integer.parseInt(request.getParameter("age"));
+			System.out.println(id);
 	
 			String insertQuery = "insert into student(sid, sname, saddress, sage) values(?,?,?,?)";
-			String checkQuery = "select count(*) from student where sid = " + id;
+			String checkQuery = "select * from student where sid = " + id;
 			
 			if(connection != null) {
 				boolean flag = false;
@@ -80,19 +81,22 @@ public class ResponseServlet extends HttpServlet {
 					pstmt  = connection.prepareStatement(checkQuery);
 					if(pstmt != null) {
 						ResultSet resultSet = pstmt.executeQuery();
-						if(resultSet.next()) {
+						while(resultSet.next()) {
 							out.println("<center><h1 style='color:red'>Student with given id already exists</h1></center>");
-						} else {
+							flag = true;
+						}
+						if(!flag) {
 							pstmt = connection.prepareStatement(insertQuery);
+							System.out.println(id);
 							pstmt.setInt(1,  id);
 							pstmt.setString(2, name);
 							pstmt.setString(3, address);
 							pstmt.setInt(4,  age);
-							flag = true;
+//							flag = true;
 						}
 					}
 					
-					if(flag && pstmt != null) {
+					if(!flag && pstmt != null) {
 						int rowAffected = pstmt.executeUpdate();
 						if(rowAffected == 1) {
 							out.println("<h1 style='color:green;text-align:center;'> REGISTRATION SUCCESSFULL</h1>");
@@ -300,4 +304,3 @@ public class ResponseServlet extends HttpServlet {
 	}
 
 }
-
